@@ -99,3 +99,12 @@ int smolrtsp_dgram_socket(int af, const void *restrict addr, uint16_t port)
  */
 void *smolrtsp_sockaddr_ip(const struct sockaddr *restrict addr)
     SMOLRTSP_PRIV_MUST_USE;
+
+/**
+ * Creates a new dummy transport.
+ *
+ * @param[in] send_fn Function to send data.
+ *
+ * @pre `fd >= 0`
+ */
+SmolRTSP_Transport smolrtsp_transport_mem(int (*send_fn)(uint8_t const* data, size_t size, bool last)) SMOLRTSP_PRIV_MUST_USE;
