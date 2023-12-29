@@ -100,11 +100,15 @@ int smolrtsp_dgram_socket(int af, const void *restrict addr, uint16_t port)
 void *smolrtsp_sockaddr_ip(const struct sockaddr *restrict addr)
     SMOLRTSP_PRIV_MUST_USE;
 
+
+typedef int (*send_fn_t)(uint8_t const* data, uint32_t size, bool last, void *arg);
 /**
  * Creates a new dummy transport.
  *
+ * @param[in] max_packet_size Max packet to be produced by single call.
  * @param[in] send_fn Function to send data.
+ * @param[in] arg user supplied pointer, will be passed ti \p send_fn.
  *
  * @pre `fd >= 0`
  */
-SmolRTSP_Transport smolrtsp_transport_mem(int (*send_fn)(uint8_t const* data, size_t size, bool last)) SMOLRTSP_PRIV_MUST_USE;
+SmolRTSP_Transport smolrtsp_transport_mem(size_t max_packet_size, send_fn_t send_fn, void *arg) SMOLRTSP_PRIV_MUST_USE;

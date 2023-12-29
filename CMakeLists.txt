@@ -87,6 +87,7 @@ set(SMOLRTSP_SOURCES
     src/writer/file.c
     src/writer/string.c
     src/util.c
+    src/transport/mem.c
     src/transport/tcp.c
     src/transport/udp.c
     src/rtp_transport.c
