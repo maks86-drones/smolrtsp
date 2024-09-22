@@ -604,7 +604,7 @@ static void send_audio_packet_cb(evutil_socket_t fd, short events, void *arg) {
                         samples_count);
 
     if (SmolRTSP_RtpTransport_send_packet(
-            ctx->transport, ts, marker, header, payload) == -1) {
+            ctx->transport, ts, marker, false, header, payload) == -1) {
         perror("Failed to send RTP/PCMU");
     }
 

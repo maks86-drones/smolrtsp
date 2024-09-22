@@ -27,7 +27,7 @@
      * @return -1 if an I/O error occurred and sets `errno` appropriately, 0   \
      * on success.                                                             \
      */                                                                        \
-    vfunc99(int, transmit, VSelf99, SmolRTSP_IoVecSlice bufs)                  \
+    vfunc99(int, transmit, VSelf99, SmolRTSP_IoVecSlice bufs, bool idr_slice)                  \
     vfunc99(bool, is_full, VSelf99)
 
 /**

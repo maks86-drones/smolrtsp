@@ -42,7 +42,7 @@ static void SmolRTSP_TcpTransport_drop(VSelf) {
 
 impl(SmolRTSP_Droppable, SmolRTSP_TcpTransport);
 
-static int SmolRTSP_TcpTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs) {
+static int SmolRTSP_TcpTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs, bool idr_slice) {
     VSELF(SmolRTSP_TcpTransport);
     assert(self);
 

@@ -41,7 +41,7 @@ static void SmolRTSP_UdpTransport_drop(VSelf) {
 
 impl(SmolRTSP_Droppable, SmolRTSP_UdpTransport);
 
-static int SmolRTSP_UdpTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs) {
+static int SmolRTSP_UdpTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs, bool idr_slice) {
     VSELF(SmolRTSP_UdpTransport);
     assert(self);
 

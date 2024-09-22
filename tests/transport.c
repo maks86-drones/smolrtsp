@@ -23,7 +23,7 @@ static enum greatest_test_res test_transport(
 
     const SmolRTSP_IoVecSlice slices = Slice99_typed_from_array(bufs);
 
-    const ssize_t ret = VCALL(t, transmit, slices);
+    const ssize_t ret = VCALL(t, transmit, slices, false);
     ASSERT_EQ(0, ret);
 
     char *buffer = malloc(len);

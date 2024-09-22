@@ -10,10 +10,10 @@
 
 static int send_fragmentized_nal_data(
     SmolRTSP_RtpTransport *t, SmolRTSP_RtpTimestamp ts, size_t max_packet_size,
-    SmolRTSP_NalUnit nalu);
+    SmolRTSP_NalUnit nalu, bool idr_slice);
 static int send_fu(
     SmolRTSP_RtpTransport *t, SmolRTSP_RtpTimestamp ts, SmolRTSP_NalUnit fu,
-    bool is_first_fragment, bool is_last_fragment);
+    bool is_first_fragment, bool is_last_fragment, bool idr_slice);
 
 SmolRTSP_NalTransportConfig SmolRTSP_NalTransportConfig_default(void) {
     return (SmolRTSP_NalTransportConfig){
@@ -73,9 +73,10 @@ int SmolRTSP_NalTransport_send_packet(
                  nalu_size =
                      SmolRTSP_NalHeader_size(nalu.header) + nalu.payload.len;
 
+    bool const idr_slice = SmolRTSP_NalHeader_is_coded_slice_idr(nalu.header);
     if (nalu_size < max_packet_size) {
         const bool marker =
-            SmolRTSP_NalHeader_is_coded_slice_idr(nalu.header) ||
+            idr_slice ||
             SmolRTSP_NalHeader_is_coded_slice_non_idr(nalu.header);
 
         const size_t header_buf_size = SmolRTSP_NalHeader_size(nalu.header);
@@ -83,19 +84,19 @@ int SmolRTSP_NalTransport_send_packet(
         SmolRTSP_NalHeader_serialize(nalu.header, header_buf);
 
         return SmolRTSP_RtpTransport_send_packet(
-            self->transport, ts, marker,
+            self->transport, ts, marker, idr_slice,
             U8Slice99_new(header_buf, header_buf_size), nalu.payload);
     }
 
     return send_fragmentized_nal_data(
-        self->transport, ts, max_packet_size, nalu);
+        self->transport, ts, max_packet_size, nalu, idr_slice);
 }
 
 // See <https://tools.ietf.org/html/rfc6184#section-5.8> (H.264),
 // <https://tools.ietf.org/html/rfc7798#section-4.4.3> (H.265).
 static int send_fragmentized_nal_data(
     SmolRTSP_RtpTransport *t, SmolRTSP_RtpTimestamp ts, size_t max_packet_size,
-    SmolRTSP_NalUnit nalu) {
+    SmolRTSP_NalUnit nalu, bool idr_slice) {
     const size_t rem = nalu.payload.len % max_packet_size,
                  packets_count = (nalu.payload.len - rem) / max_packet_size;
 
@@ -110,7 +111,7 @@ static int send_fragmentized_nal_data(
                              : (packet_idx + 1) * max_packet_size);
         const SmolRTSP_NalUnit fu = {nalu.header, fu_data};
 
-        if (send_fu(t, ts, fu, is_first_fragment, is_last_fragment) == -1) {
+        if (send_fu(t, ts, fu, is_first_fragment, is_last_fragment, idr_slice) == -1) {
             return -1;
         }
     }
@@ -122,7 +123,7 @@ static int send_fragmentized_nal_data(
         const bool is_first_fragment = 0 == packets_count,
                    is_last_fragment = true;
 
-        if (send_fu(t, ts, fu, is_first_fragment, is_last_fragment) == -1) {
+        if (send_fu(t, ts, fu, is_first_fragment, is_last_fragment, idr_slice) == -1) {
             return -1;
         }
     }
@@ -132,7 +133,7 @@ static int send_fragmentized_nal_data(
 
 static int send_fu(
     SmolRTSP_RtpTransport *t, SmolRTSP_RtpTimestamp ts, SmolRTSP_NalUnit fu,
-    bool is_first_fragment, bool is_last_fragment) {
+    bool is_first_fragment, bool is_last_fragment, bool idr_slice) {
     const size_t fu_header_size = SmolRTSP_NalHeader_fu_size(fu.header);
     U8Slice99 fu_header = U8Slice99_new(alloca(fu_header_size), fu_header_size);
 
@@ -142,5 +143,5 @@ static int send_fu(
     const bool marker = is_last_fragment;
 
     return SmolRTSP_RtpTransport_send_packet(
-        t, ts, marker, fu_header, fu.payload);
+        t, ts, marker, idr_slice, fu_header, fu.payload);
 }

@@ -43,7 +43,7 @@ static void SmolRTSP_MemTransport_drop(VSelf) {
 
 impl(SmolRTSP_Droppable, SmolRTSP_MemTransport);
 
-static int SmolRTSP_MemTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs) {
+static int SmolRTSP_MemTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs, bool idr_slice) {
     VSELF(SmolRTSP_MemTransport);
     assert(self);
     assert(self->send);
@@ -56,7 +56,7 @@ static int SmolRTSP_MemTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs) {
         size_t const buff_size = bufs.ptr[i].iov_len;
         size_t next_offs = offset + buff_size;
         if (next_offs > self->max_packet_size) {
-            printf("========> RTP packet was fragmented: max packet: %d, next: %d, len: %d\n", self->max_packet_size, next_offs, bufs.ptr[i].iov_len);
+            // printf("========> RTP packet was fragmented: max packet: %d, next: %d, len: %d\n", self->max_packet_size, next_offs, bufs.ptr[i].iov_len);
             if (!self->send(p, offset, true, self->arg)) {
                 return -1;
             }
@@ -69,7 +69,7 @@ static int SmolRTSP_MemTransport_transmit(VSelf, SmolRTSP_IoVecSlice bufs) {
     }
 
     if (offset > 0) {
-        return self->send(p, offset, true, self->arg);
+        return self->send(p, offset, idr_slice, self->arg);
     } else {
         return 0;
     }
