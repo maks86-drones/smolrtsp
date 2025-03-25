@@ -14,22 +14,22 @@ include(FetchContent)
 FetchContent_Declare(
   slice99
   GIT_REPOSITORY https://github.com/Hirrolot/slice99
-  GIT_TAG 7075e1e)
+  GIT_TAG 54122292e51a87403a1cdd5ff4e43fd25c3e0761)
 
 FetchContent_Declare(
   metalang99
   GIT_REPOSITORY https://github.com/Hirrolot/metalang99
-  GIT_TAG e0eb4e1)
+  GIT_TAG 5337c43d869a1985eb3aef4e316b728b7a9ac916)
 
 FetchContent_Declare(
   datatype99
   GIT_REPOSITORY https://github.com/Hirrolot/datatype99
-  GIT_TAG aa24712)
+  GIT_TAG e24fc6a8baadc82a99708829a38aeba027bbcdd9)
 
 FetchContent_Declare(
   interface99
   GIT_REPOSITORY https://github.com/Hirrolot/interface99
-  GIT_TAG 73c7c1e)
+  GIT_TAG 723bc751f13ef221e6adf285015737387010518b)
 
 FetchContent_MakeAvailable(slice99 datatype99 interface99)
 
